@@ -1,0 +1,125 @@
+-- FreeFem++ v4.14 (Mon Mar 18 14:46:45 CET 2024 - git v4.14-47-gf36d6d9d)
+   file : C:\Users\Lenovo\Desktop\CodeShit\FreeFEM\test\A3.edp
+ Load: lg_fem lg_mesh lg_mesh3 eigenvalue
+    1 : load "medit"(load: loadLibary C:\Program Files (x86)\FreeFem++\\.\medit = 0)
+    2 :
+    3 :
+    4 : border C1(t = 0,1)    {x=t;   y=0;   label = 1;}
+    5 : border C2(t = 0,1)    {x=1;   y=t;   label = 2;}
+    6 : border C3(t = 0,1)    {x=1-t; y=1;   label = 3;}
+    7 : border C4(t = 0,1)    {x=0;   y=1-t; label = 4;}
+    8 : border C5(t = 0,2*pi) {x=0.5 + 0.1*cos(t); y=0.5 + 0.1*sin(t); label = 5;}
+    9 :
+   10 : mesh Th = buildmesh (C1(10) + C2(10) + C3(10) + C4(10) + C5(24));
+   11 :
+   12 :
+   13 :
+   14 : medit("domain", Th);
+   15 :
+   16 : real a = 1, tau = 0.1;
+   17 :
+   18 :
+   19 :
+   20 :
+   21 : fespace Vh(Th,P1);
+   22 : Vh u,v,f,u0,un;
+   23 :
+   24 :
+   25 :
+   26 : u0 = 0;
+   27 : un = 0;
+   28 :
+   29 :
+   30 :
+   31 :
+   32 : for(int i=0; i< 3; i++){
+   33 :
+   34 : cout << endl << endl << "i = " << i << endl << endl;
+   35 :
+   36 : for(int k=0; k< 6; k++){
+   37 :
+   38 : solve Poisson(u,v) = int2d(Th)(u*v) - int2d(Th)(u0*v) + int2d(Th)(a*tau*dx(u)*dx(v) + a*tau*dy(u)*dy(v)) - int2d(Th)(tau*un*u*v) - int2d(Th)(tau*v)
+   39 :                    + on(1,2,3,4,u=0);
+   40 : un = u;
+   41 : }
+   42 : u0 = u;
+   43 : }
+   44 :
+   45 : plot(u,wait=true,value=true,fill=true); sizestack + 1024 =3280  ( 2256 )
+ 
+  --  mesh:  Nb of Triangles =    638, Nb of Vertices 340
+version de medit ffmedit.exe -popen -filebin 1  domain
+  -- Medit,  Release 3.0a (Nov. 30, 2007)
+     Copyright (c) LJLL, 1999-2007.
+     compiled:  Mon Mar 4 11:44:04 CET 2024 (with ff++ 4.14).
+ 
+medit with binary version of popen : mesh(es)
+mesh_name= domain
+ Loading data file(s)
+End of mesh
+  Input seconds:     0.00
+ 
+ medit1()
+ 
+ Building scene(s)
+  Creating scene 1
+   Loading default options
+  Scene seconds:     0.24
+ 
+ Rendering scene(s)
+ 
+ Total running seconds:  1.59
+ Thank you for using Medit.
+ 
+ 
+i = 0
+ 
+  -- Solve :
+          min 1.11926e-64  max 0.0468023
+  -- Solve :
+          min 1.11989e-64  max 0.0468711
+  -- Solve :
+          min 1.1199e-64  max 0.0468712
+  -- Solve :
+          min 1.1199e-64  max 0.0468712
+  -- Solve :
+          min 1.1199e-64  max 0.0468712
+  -- Solve :
+          min 1.1199e-64  max 0.0468712
+ 
+ 
+i = 1
+ 
+  -- Solve :
+          min 1.34613e-64  max 0.064278
+  -- Solve :
+          min 1.3464e-64  max 0.0643106
+  -- Solve :
+          min 1.3464e-64  max 0.0643107
+  -- Solve :
+          min 1.3464e-64  max 0.0643107
+  -- Solve :
+          min 1.3464e-64  max 0.0643107
+  -- Solve :
+          min 1.3464e-64  max 0.0643107
+ 
+ 
+i = 2
+ 
+  -- Solve :
+          min 1.41406e-64  max 0.0703301
+  -- Solve :
+          min 1.41416e-64  max 0.0703422
+  -- Solve :
+          min 1.41416e-64  max 0.0703422
+  -- Solve :
+          min 1.41416e-64  max 0.0703422
+  -- Solve :
+          min 1.41416e-64  max 0.0703422
+  -- Solve :
+          min 1.41416e-64  max 0.0703422
+times: compile 0.043s, execution 1.806s,  mpirank:0
+ ######## We forget of deleting   531 Nb pointer,   0Bytes  ,  mpirank 0, memory leak =0
+ CodeAlloc : nb ptr  4154,  size :536752 mpirank: 0
+Ok: Normal End
+ try getConsole C:\Users\Lenovo\Desktop\CodeShit\FreeFEM\test\A3.edp

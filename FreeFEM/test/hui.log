@@ -1,0 +1,63 @@
+-- FreeFem++ v4.14 (Mon Mar 18 14:46:45 CET 2024 - git v4.14-47-gf36d6d9d)
+   file : C:\Users\Lenovo\Desktop\CodeShit\FreeFEM\test\hui.edp
+ Load: lg_fem lg_mesh lg_mesh3 eigenvalue
+    1 : //oad "medit"
+    2 :
+    3 : // for (int i = 1; i < 100 ;i++) {
+    4 :
+    5 : //     border C1 (t = 0, 2.*pi) {x=cos(t); y=sin(t) * i / 100; label = 1;}
+    6 : //     mesh Th = buildmesh (C1(10));
+    7 : //     plot(Th);
+    8 : // }
+    9 :
+   10 : // border C1 (t = 0, 2.*pi) {x=(5^(sin(t)^15))*cos(t); y=(5^(sin(t)^15))*sin(t); label = 1;}
+   11 : // mesh Th = buildmesh (C1(150));
+   12 : // plot(Th);
+   13 :
+   14 : // for (int i = 0; i < 365 ; i+=5) {
+   15 : //     mesh TH = movemesh(Th, [x * cos(pi*i/180) - y * sin(pi*i/180), x * sin(pi*i/180) + y * cos(pi*i/180)]);
+   16 : //     plot(TH);
+   17 : // }
+   18 :
+   19 :
+   20 : // border C1 (t = -5/4. * pi, pi / 4.) { x=(5^(sin(t)^15))*cos(t); y=(5^(sin(t)^15))*sin(t); label = 1; }
+   21 :
+   22 : // border C2 (t = pi / 4, 3/4. * pi) { x=(5^(sin(t)^15))*cos(t); y=(5^(sin(t)^15))*sin(t); label = 2; }
+   23 :
+   24 : // mesh Th = buildmesh (C1(20) + C2(40));
+   25 : // plot(Th);
+   26 :
+   27 :
+   28 : // border C1 (t = 0, 2.*pi) {x = 5^(sin(t) ^ 15) * cos(t); y = 5^(sin(t) ^ 15) * sin(t); label = 1;}
+   29 :
+   30 : // mesh Th = buildmesh(C1(350));
+   31 :
+   32 : // fespace Vh(Th,P1);
+   33 :
+   34 : // Vh f;
+   35 : // f = sin(x^2 + y^2) < 0.1;
+   36 : // plot(f, fill=true);
+   37 :
+   38 :
+   39 : // mesh Th = square(1, 1); // Создание прямоугольной сетки
+   40 : // fespace Vh(Th, P1); // Определение конечно-элементного пространства
+   41 :
+   42 : // Vh u = x + y; // Определение функции u = x + y
+   43 : // plot(u, cmm="Initial u"); // Визуализация начальной функции u
+   44 :
+   45 : // // Задание граничного условия u = sin(pi * x * y) на левой границе (граница номер 1)
+   46 : // on(1, u = sin(pi * x));
+   47 :
+   48 : // plot(u, cmm="Modified u with 2-variable boundary condition"); // Визуализация функции u с граничным условием
+   49 :
+   50 : int n = 5;
+   51 : border[
+ Error line number 51, in file C:\Users\Lenovo\Desktop\CodeShit\FreeFEM\test\hui.edp, before  token [
+syntax error
+  current line = 51
+Compile error : syntax error
+        line number :51, [
+error Compile error : syntax error
+        line number :51, [
+ code = 1 mpirank: 0
+ try getConsole C:\Users\Lenovo\Desktop\CodeShit\FreeFEM\test\hui.edp

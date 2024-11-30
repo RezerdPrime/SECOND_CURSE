@@ -1,0 +1,636 @@
+-- FreeFem++ v4.14 (Mon Mar 18 14:46:45 CET 2024 - git v4.14-47-gf36d6d9d)
+   file : C:\Users\Lenovo\Desktop\CodeShit\FreeFEM\test\A20.edp
+ Load: lg_fem lg_mesh lg_mesh3 eigenvalue
+    1 : load "medit"(load: loadLibary C:\Program Files (x86)\FreeFem++\\.\medit = 0)
+    2 :
+    3 :
+    4 : border C1(t = 0,1)    {x=t;   y=0;   label = 1;}
+    5 : border C2(t = 0,1)    {x=1;   y=t;   label = 2;}
+    6 : border C3(t = 0,1)    {x=1-t; y=1;   label = 3;}
+    7 : border C4(t = 0,1)    {x=0;   y=1-t; label = 4;}
+    8 : border C5(t = 0,2*pi) {x=0.5 + 0.1*cos(t); y=0.5 + 0.1*sin(t); label = 5;}
+    9 :
+   10 : mesh Th = buildmesh (C1(30) + C2(30) + C3(30) + C4(30) + C5(24));
+   11 :
+   12 :
+   13 :
+   14 : medit("domain", Th);
+   15 :
+   16 : real a = 1., tau = 0.1;
+   17 :
+   18 :
+   19 :
+   20 :
+   21 : fespace Vh(Th,P1);
+   22 : Vh u,v,f,u0;
+   23 :
+   24 : f = 1.*((x-0.5)^2 + (y-0.5)^2 < 0.01);
+   25 :
+   26 : u0 = 0;
+   27 :
+   28 : for(int i=0; i<900; i++){
+   29 :
+   30 : solve Poisson(u,v) = int2d(Th)(u*v) - int2d(Th)(u0*v) + int2d(Th)(a*tau*dx(u)*dx(v) + a*tau*dy(u)*dy(v)) - int2d(Th)(tau*f*i*tau*v)
+   31 :                    + on(2,3,4,u=0) + on(1,u=1);
+   32 : u0 = u;
+   33 : plot(u,wait=0,value=true,fill=true);
+   34 : }
+   35 :
+   36 :  sizestack + 1024 =3248  ( 2224 )
+ 
+  --  mesh:  Nb of Triangles =   2398, Nb of Vertices 1260
+version de medit ffmedit.exe -popen -filebin 1  domain
+  -- Medit,  Release 3.0a (Nov. 30, 2007)
+     Copyright (c) LJLL, 1999-2007.
+     compiled:  Mon Mar 4 11:44:04 CET 2024 (with ff++ 4.14).
+ 
+medit with binary version of popen : mesh(es)
+mesh_name= domain
+ Loading data file(s)
+End of mesh
+  Input seconds:     0.00
+ 
+ medit1()
+ 
+ Building scene(s)
+  Creating scene 1
+   Loading default options
+  Scene seconds:     0.22
+ 
+ Rendering scene(s)
+ 
+ Total running seconds:  1.91
+ Thank you for using Medit.
+  -- Solve :
+          min 5.05681e-66  max 1
+  -- Solve :
+          min 9.45437e-66  max 1
+  -- Solve :
+          min 1.17764e-65  max 1
+  -- Solve :
+          min 1.27772e-65  max 1
+  -- Solve :
+          min 1.31812e-65  max 1
+  -- Solve :
+          min 1.33529e-65  max 1
+  -- Solve :
+          min 1.34405e-65  max 1
+  -- Solve :
+          min 1.34988e-65  max 1
+  -- Solve :
+          min 1.35471e-65  max 1
+  -- Solve :
+          min 1.35919e-65  max 1
+  -- Solve :
+          min 1.36356e-65  max 1
+  -- Solve :
+          min 1.36788e-65  max 1
+  -- Solve :
+          min 1.3722e-65  max 1
+  -- Solve :
+          min 1.37651e-65  max 1
+  -- Solve :
+          min 1.38082e-65  max 1
+  -- Solve :
+          min 1.38513e-65  max 1
+  -- Solve :
+          min 1.38944e-65  max 1
+  -- Solve :
+          min 1.39375e-65  max 1
+  -- Solve :
+          min 1.39806e-65  max 1
+  -- Solve :
+          min 1.40237e-65  max 1
+  -- Solve :
+          min 1.40668e-65  max 1
+  -- Solve :
+          min 1.41098e-65  max 1
+  -- Solve :
+          min 1.41529e-65  max 1
+  -- Solve :
+          min 1.4196e-65  max 1
+  -- Solve :
+          min 1.42391e-65  max 1
+  -- Solve :
+          min 1.42822e-65  max 1
+  -- Solve :
+          min 1.43253e-65  max 1
+  -- Solve :
+          min 1.43684e-65  max 1
+  -- Solve :
+          min 1.44115e-65  max 1
+  -- Solve :
+          min 1.44546e-65  max 1
+  -- Solve :
+          min 1.44977e-65  max 1
+  -- Solve :
+          min 1.45408e-65  max 1
+  -- Solve :
+          min 1.45838e-65  max 1
+  -- Solve :
+          min 1.46269e-65  max 1
+  -- Solve :
+          min 1.467e-65  max 1
+  -- Solve :
+          min 1.47131e-65  max 1
+  -- Solve :
+          min 1.47562e-65  max 1
+  -- Solve :
+          min 1.47993e-65  max 1
+  -- Solve :
+          min 1.48424e-65  max 1
+  -- Solve :
+          min 1.48855e-65  max 1
+  -- Solve :
+          min 1.49286e-65  max 1
+  -- Solve :
+          min 1.49717e-65  max 1
+  -- Solve :
+          min 1.50147e-65  max 1
+  -- Solve :
+          min 1.50578e-65  max 1
+  -- Solve :
+          min 1.51009e-65  max 1
+  -- Solve :
+          min 1.5144e-65  max 1
+  -- Solve :
+          min 1.51871e-65  max 1
+  -- Solve :
+          min 1.52302e-65  max 1
+  -- Solve :
+          min 1.52733e-65  max 1
+  -- Solve :
+          min 1.53164e-65  max 1
+  -- Solve :
+          min 1.53595e-65  max 1
+  -- Solve :
+          min 1.54026e-65  max 1
+  -- Solve :
+          min 1.54457e-65  max 1
+  -- Solve :
+          min 1.54887e-65  max 1
+  -- Solve :
+          min 1.55318e-65  max 1
+  -- Solve :
+          min 1.55749e-65  max 1
+  -- Solve :
+          min 1.5618e-65  max 1
+  -- Solve :
+          min 1.56611e-65  max 1
+  -- Solve :
+          min 1.57042e-65  max 1
+  -- Solve :
+          min 1.57473e-65  max 1
+  -- Solve :
+          min 1.57904e-65  max 1
+  -- Solve :
+          min 1.58335e-65  max 1
+  -- Solve :
+          min 1.58766e-65  max 1
+  -- Solve :
+          min 1.59196e-65  max 1
+  -- Solve :
+          min 1.59627e-65  max 1
+  -- Solve :
+          min 1.60058e-65  max 1
+  -- Solve :
+          min 1.60489e-65  max 1
+  -- Solve :
+          min 1.6092e-65  max 1
+  -- Solve :
+          min 1.61351e-65  max 1
+  -- Solve :
+          min 1.61782e-65  max 1
+  -- Solve :
+          min 1.62213e-65  max 1
+  -- Solve :
+          min 1.62644e-65  max 1
+  -- Solve :
+          min 1.63075e-65  max 1
+  -- Solve :
+          min 1.63506e-65  max 1
+  -- Solve :
+          min 1.63936e-65  max 1
+  -- Solve :
+          min 1.64367e-65  max 1
+  -- Solve :
+          min 1.64798e-65  max 1
+  -- Solve :
+          min 1.65229e-65  max 1
+  -- Solve :
+          min 1.6566e-65  max 1
+  -- Solve :
+          min 1.66091e-65  max 1
+  -- Solve :
+          min 1.66522e-65  max 1
+  -- Solve :
+          min 1.66953e-65  max 1
+  -- Solve :
+          min 1.67384e-65  max 1
+  -- Solve :
+          min 1.67815e-65  max 1
+  -- Solve :
+          min 1.68245e-65  max 1
+  -- Solve :
+          min 1.68676e-65  max 1
+  -- Solve :
+          min 1.69107e-65  max 1
+  -- Solve :
+          min 1.69538e-65  max 1
+  -- Solve :
+          min 1.69969e-65  max 1
+  -- Solve :
+          min 1.704e-65  max 1
+  -- Solve :
+          min 1.70831e-65  max 1
+  -- Solve :
+          min 1.71262e-65  max 1
+  -- Solve :
+          min 1.71693e-65  max 1
+  -- Solve :
+          min 1.72124e-65  max 1
+  -- Solve :
+          min 1.72555e-65  max 1
+  -- Solve :
+          min 1.72985e-65  max 1
+  -- Solve :
+          min 1.73416e-65  max 1
+  -- Solve :
+          min 1.73847e-65  max 1
+  -- Solve :
+          min 1.74278e-65  max 1
+  -- Solve :
+          min 1.74709e-65  max 1
+  -- Solve :
+          min 1.7514e-65  max 1
+  -- Solve :
+          min 1.75571e-65  max 1
+  -- Solve :
+          min 1.76002e-65  max 1
+  -- Solve :
+          min 1.76433e-65  max 1
+  -- Solve :
+          min 1.76864e-65  max 1
+  -- Solve :
+          min 1.77294e-65  max 1
+  -- Solve :
+          min 1.77725e-65  max 1
+  -- Solve :
+          min 1.78156e-65  max 1
+  -- Solve :
+          min 1.78587e-65  max 1
+  -- Solve :
+          min 1.79018e-65  max 1
+  -- Solve :
+          min 1.79449e-65  max 1
+  -- Solve :
+          min 1.7988e-65  max 1
+  -- Solve :
+          min 1.80311e-65  max 1
+  -- Solve :
+          min 1.80742e-65  max 1
+  -- Solve :
+          min 1.81173e-65  max 1
+  -- Solve :
+          min 1.81604e-65  max 1
+  -- Solve :
+          min 1.82034e-65  max 1
+  -- Solve :
+          min 1.82465e-65  max 1
+  -- Solve :
+          min 1.82896e-65  max 1
+  -- Solve :
+          min 1.83327e-65  max 1
+  -- Solve :
+          min 1.83758e-65  max 1
+  -- Solve :
+          min 1.84189e-65  max 1
+  -- Solve :
+          min 1.8462e-65  max 1
+  -- Solve :
+          min 1.85051e-65  max 1
+  -- Solve :
+          min 1.85482e-65  max 1
+  -- Solve :
+          min 1.85913e-65  max 1
+  -- Solve :
+          min 1.86343e-65  max 1
+  -- Solve :
+          min 1.86774e-65  max 1
+  -- Solve :
+          min 1.87205e-65  max 1
+  -- Solve :
+          min 1.87636e-65  max 1
+  -- Solve :
+          min 1.88067e-65  max 1
+  -- Solve :
+          min 1.88498e-65  max 1
+  -- Solve :
+          min 1.88929e-65  max 1
+  -- Solve :
+          min 1.8936e-65  max 1
+  -- Solve :
+          min 1.89791e-65  max 1
+  -- Solve :
+          min 1.90222e-65  max 1
+  -- Solve :
+          min 1.90653e-65  max 1
+  -- Solve :
+          min 1.91083e-65  max 1
+  -- Solve :
+          min 1.91514e-65  max 1
+  -- Solve :
+          min 1.91945e-65  max 1
+  -- Solve :
+          min 1.92376e-65  max 1
+  -- Solve :
+          min 1.92807e-65  max 1
+  -- Solve :
+          min 1.93238e-65  max 1
+  -- Solve :
+          min 1.93669e-65  max 1
+  -- Solve :
+          min 1.941e-65  max 1
+  -- Solve :
+          min 1.94531e-65  max 1
+  -- Solve :
+          min 1.94962e-65  max 1
+  -- Solve :
+          min 1.95392e-65  max 1
+  -- Solve :
+          min 1.95823e-65  max 1
+  -- Solve :
+          min 1.96254e-65  max 1
+  -- Solve :
+          min 1.96685e-65  max 1
+  -- Solve :
+          min 1.97116e-65  max 1
+  -- Solve :
+          min 1.97547e-65  max 1
+  -- Solve :
+          min 1.97978e-65  max 1
+  -- Solve :
+          min 1.98409e-65  max 1
+  -- Solve :
+          min 1.9884e-65  max 1
+  -- Solve :
+          min 1.99271e-65  max 1
+  -- Solve :
+          min 1.99702e-65  max 1
+  -- Solve :
+          min 2.00132e-65  max 1
+  -- Solve :
+          min 2.00563e-65  max 1
+  -- Solve :
+          min 2.00994e-65  max 1
+  -- Solve :
+          min 2.01425e-65  max 1
+  -- Solve :
+          min 2.01856e-65  max 1
+  -- Solve :
+          min 2.02287e-65  max 1
+  -- Solve :
+          min 2.02718e-65  max 1
+  -- Solve :
+          min 2.03149e-65  max 1
+  -- Solve :
+          min 2.0358e-65  max 1
+  -- Solve :
+          min 2.04011e-65  max 1
+  -- Solve :
+          min 2.04441e-65  max 1
+  -- Solve :
+          min 2.04872e-65  max 1
+  -- Solve :
+          min 2.05303e-65  max 1
+  -- Solve :
+          min 2.05734e-65  max 1
+  -- Solve :
+          min 2.06165e-65  max 1
+  -- Solve :
+          min 2.06596e-65  max 1
+  -- Solve :
+          min 2.07027e-65  max 1
+  -- Solve :
+          min 2.07458e-65  max 1
+  -- Solve :
+          min 2.07889e-65  max 1
+  -- Solve :
+          min 2.0832e-65  max 1
+  -- Solve :
+          min 2.08751e-65  max 1
+  -- Solve :
+          min 2.09181e-65  max 1
+  -- Solve :
+          min 2.09612e-65  max 1
+  -- Solve :
+          min 2.10043e-65  max 1
+  -- Solve :
+          min 2.10474e-65  max 1
+  -- Solve :
+          min 2.10905e-65  max 1
+  -- Solve :
+          min 2.11336e-65  max 1
+  -- Solve :
+          min 2.11767e-65  max 1
+  -- Solve :
+          min 2.12198e-65  max 1
+  -- Solve :
+          min 2.12629e-65  max 1
+  -- Solve :
+          min 2.1306e-65  max 1
+  -- Solve :
+          min 2.1349e-65  max 1
+  -- Solve :
+          min 2.13921e-65  max 1
+  -- Solve :
+          min 2.14352e-65  max 1
+  -- Solve :
+          min 2.14783e-65  max 1
+  -- Solve :
+          min 2.15214e-65  max 1
+  -- Solve :
+          min 2.15645e-65  max 1
+  -- Solve :
+          min 2.16076e-65  max 1
+  -- Solve :
+          min 2.16507e-65  max 1
+  -- Solve :
+          min 2.16938e-65  max 1
+  -- Solve :
+          min 2.17369e-65  max 1
+  -- Solve :
+          min 2.178e-65  max 1
+  -- Solve :
+          min 2.1823e-65  max 1
+  -- Solve :
+          min 2.18661e-65  max 1
+  -- Solve :
+          min 2.19092e-65  max 1
+  -- Solve :
+          min 2.19523e-65  max 1
+  -- Solve :
+          min 2.19954e-65  max 1
+  -- Solve :
+          min 2.20385e-65  max 1
+  -- Solve :
+          min 2.20816e-65  max 1
+  -- Solve :
+          min 2.21247e-65  max 1
+  -- Solve :
+          min 2.21678e-65  max 1
+  -- Solve :
+          min 2.22109e-65  max 1
+  -- Solve :
+          min 2.22539e-65  max 1
+  -- Solve :
+          min 2.2297e-65  max 1
+  -- Solve :
+          min 2.23401e-65  max 1
+  -- Solve :
+          min 2.23832e-65  max 1
+  -- Solve :
+          min 2.24263e-65  max 1
+  -- Solve :
+          min 2.24694e-65  max 1
+  -- Solve :
+          min 2.25125e-65  max 1
+  -- Solve :
+          min 2.25556e-65  max 1
+  -- Solve :
+          min 2.25987e-65  max 1
+  -- Solve :
+          min 2.26418e-65  max 1
+  -- Solve :
+          min 2.26849e-65  max 1
+  -- Solve :
+          min 2.27279e-65  max 1
+  -- Solve :
+          min 2.2771e-65  max 1
+  -- Solve :
+          min 2.28141e-65  max 1
+  -- Solve :
+          min 2.28572e-65  max 1
+  -- Solve :
+          min 2.29003e-65  max 1
+  -- Solve :
+          min 2.29434e-65  max 1
+  -- Solve :
+          min 2.29865e-65  max 1
+  -- Solve :
+          min 2.30296e-65  max 1
+  -- Solve :
+          min 2.30727e-65  max 1
+  -- Solve :
+          min 2.31158e-65  max 1
+  -- Solve :
+          min 2.31588e-65  max 1
+  -- Solve :
+          min 2.32019e-65  max 1
+  -- Solve :
+          min 2.3245e-65  max 1
+  -- Solve :
+          min 2.32881e-65  max 1
+  -- Solve :
+          min 2.33312e-65  max 1
+  -- Solve :
+          min 2.33743e-65  max 1
+  -- Solve :
+          min 2.34174e-65  max 1
+  -- Solve :
+          min 2.34605e-65  max 1
+  -- Solve :
+          min 2.35036e-65  max 1
+  -- Solve :
+          min 2.35467e-65  max 1
+  -- Solve :
+          min 2.35898e-65  max 1
+  -- Solve :
+          min 2.36328e-65  max 1
+  -- Solve :
+          min 2.36759e-65  max 1
+  -- Solve :
+          min 2.3719e-65  max 1
+  -- Solve :
+          min 2.37621e-65  max 1
+  -- Solve :
+          min 2.38052e-65  max 1
+  -- Solve :
+          min 2.38483e-65  max 1
+  -- Solve :
+          min 2.38914e-65  max 1
+  -- Solve :
+          min 2.39345e-65  max 1
+  -- Solve :
+          min 2.39776e-65  max 1
+  -- Solve :
+          min 2.40207e-65  max 1
+  -- Solve :
+          min 2.40637e-65  max 1
+  -- Solve :
+          min 2.41068e-65  max 1
+  -- Solve :
+          min 2.41499e-65  max 1
+  -- Solve :
+          min 2.4193e-65  max 1
+  -- Solve :
+          min 2.42361e-65  max 1
+  -- Solve :
+          min 2.42792e-65  max 1
+  -- Solve :
+          min 2.43223e-65  max 1
+  -- Solve :
+          min 2.43654e-65  max 1
+  -- Solve :
+          min 2.44085e-65  max 1
+  -- Solve :
+          min 2.44516e-65  max 1
+  -- Solve :
+          min 2.44947e-65  max 1
+  -- Solve :
+          min 2.45377e-65  max 1
+  -- Solve :
+          min 2.45808e-65  max 1
+  -- Solve :
+          min 2.46239e-65  max 1
+  -- Solve :
+          min 2.4667e-65  max 1
+  -- Solve :
+          min 2.47101e-65  max 1
+  -- Solve :
+          min 2.47532e-65  max 1
+  -- Solve :
+          min 2.47963e-65  max 1
+  -- Solve :
+          min 2.48394e-65  max 1
+  -- Solve :
+          min 2.48825e-65  max 1
+  -- Solve :
+          min 2.49256e-65  max 1
+  -- Solve :
+          min 2.49686e-65  max 1
+  -- Solve :
+          min 2.50117e-65  max 1
+  -- Solve :
+          min 2.50548e-65  max 1
+  -- Solve :
+          min 2.50979e-65  max 1
+  -- Solve :
+          min 2.5141e-65  max 1
+  -- Solve :
+          min 2.51841e-65  max 1
+  -- Solve :
+          min 2.52272e-65  max 1
+  -- Solve :
+          min 2.52703e-65  max 1
+  -- Solve :
+          min 2.53134e-65  max 1
+  -- Solve :
+          min 2.53565e-65  max 1
+  -- Solve :
+          min 2.53996e-65  max 1
+  -- Solve :
+          min 2.54426e-65  max 1
+  -- Solve :
+          min 2.54857e-65  max 1
+ try getConsole C:\Users\Lenovo\Desktop\CodeShit\FreeFEM\test\A20.edp

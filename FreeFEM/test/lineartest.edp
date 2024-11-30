@@ -1,0 +1,165 @@
+load "medit"
+
+// border S1(t=-0.5, 0.5) {x=0.5; y=t; label=1;}
+// border S2(t=-0.5, 0.5) {x=-t; y=0.5; label=1;}
+// border S3(t=-0.5, 0.5) {x=-0.5; y=-t; label=1;}
+// border S4(t=-0.5, 0.5) {x=t; y=-0.5; label=1;}
+
+real rr = 0.05;
+
+real[int] A = [1.3, 0.5];
+real[int] B = [1.0, 0.8];
+real[int] C = [0.7, 0.7];
+real[int] D = [0.35, 1.0];
+
+real[int] E = [0.3, 0.3];
+real[int] F = [0.6, 1.2];
+real[int] G = [0.8, 0.4];
+real[int] H = [1.2, 1.25];
+
+
+border C1(t = 0,1.5)    {x=t;     y=0;     label = 1;}
+border C2(t = 0,1.5)    {x=1.5;   y=t;     label = 2;}
+border C3(t = 0,1.5)    {x=1.5-t; y=1.5;   label = 3;}
+border C4(t = 0,1.5)    {x=0;     y=1.5-t; label = 4;}
+
+border In1(t=0, 2*pi) {x=-rr*cos(t) + A[0]; 
+                       y=rr*sin(t) + A[1]; label=5;}
+border In2(t=0, 2*pi) {x=-rr*cos(t) + B[0]; 
+                       y=rr*sin(t) + B[1]; label=5;}
+border In3(t=0, 2*pi) {x=rr*cos(t) + C[0]; 
+                       y=-rr*sin(t) + C[1]; label=5;}
+border In4(t=0, 2*pi) {x=-rr*cos(t) + D[0]; 
+                       y=rr*sin(t) + D[1]; label=5;}
+border Out1(t=0, 2*pi) {x=-rr*cos(t) + E[0]; 
+                        y=rr*sin(t) + E[1]; label=6;}
+border Out2(t=0, 2*pi) {x=-rr*cos(t) + F[0]; 
+                        y=rr*sin(t) + F[1]; label=6;}
+border Out3(t=0, 2*pi) {x=-rr*cos(t) + G[0]; 
+                        y=rr*sin(t) + G[1]; label=6;}
+border Out4(t=0, 2*pi) {x=-rr*cos(t) + H[0]; 
+                        y=rr*sin(t) + H[1]; label=6;}
+
+int CIRCLES = 8, LINES = 60;
+
+mesh Th = buildmesh(C1(LINES) + C2(LINES) + C3(LINES) + C4(LINES) 
+                    + In1(CIRCLES) + In2(CIRCLES) + In3(CIRCLES) + In4(CIRCLES) 
+                    + Out1(CIRCLES) + Out2(CIRCLES) + Out3(CIRCLES) + Out4(CIRCLES));
+medit("domain", Th);
+
+
+real sigma = 0.03, alpha = 2.2e-3, beta = 2.4e-3, a=39, b=9.2, 
+     psiH = 3.6e-2, mu0 = 0.08, r=2.73;
+real gamma = 1000*alpha, delta = 1000*beta, 
+     phi0 = 4, theta0 = 0.01, kappa = sigma / (1 - sigma);
+real kk, tau = 0.05; // шаг по времени
+
+fespace Vh(Th, P1);
+Vh vel1, vel2, p, u1, u2, q, phi, theta, v, mu, psi, phiPrev, thetaPrev, theta50, phiB, thetaB;//, thetalinear;
+phiPrev = phi0; 
+thetaPrev = theta0;
+theta = theta0;
+
+Vh thetaD;
+//thetalinear = theta0;
+kk = 2./115; //theta0 / phi0;
+vel2 = 0.2;
+theta50 = 5e-5;
+
+//phiB = 9.2*((x+A[0])^2 + (y+A[1])^2 < rr) + 9.2*((x+B[0])^2 + (y+B[1])^2 < rr) + 8.2*((x+C[0])^2 + (y+C[1])^2 < rr) + 8.2*((x+D[0])^2 + (y+D[1])^2 < rr);
+//thetaB = 0.16*((x+A[0])^2 + (y+A[1])^2 < rr) + 0.16*((x+B[0])^2 + (y+B[1])^2 < rr) + 0.076*((x+C[0])^2 + (y+C[1])^2 < rr) + 0.076*((x+D[0])^2 + (y+D[1])^2 < rr);
+
+phiB = 0.2;
+thetaB = 0.9;
+
+//-rr*cos(t) + 0.8; 
+//                        y=rr*sin(t) + 0.3; label=2;}
+// border In2(t=0, 2*pi) {x=-rr*cos(t) + 0.37; 
+//                        y=rr*sin(t) + 0.58;
+// func real g(real phi, real phiB, real thetaB) {
+//     return phi * k;
+// }
+
+// func real mu(real theta) {
+//     return ;
+// } 
+
+// func f(real psi) {
+//     return psi + b * psi^r / (psi^r + c);
+// }
+
+// real phi_target = 5.0; // Значение для phi, которое необходимо найти
+// real psi_guess = ; // Начальное предположение для psi
+// real tolerance = 1e-6; // Допустимое отклонение
+
+// real psi = psi_guess;
+// real psi_prev;
+
+// do {
+//     psi_prev = psi;
+//     real f_val = f(psi) - phi_target;
+//     real f_prime = (f(psi + 1e-6) - f(psi)) / 1e-6;
+//     psi = psi - f_val / f_prime;
+// } while (abs(psi - psi_prev) > tolerance);
+
+
+solve Stokes(vel1, vel2, p, u1, u2, q) = int2d(Th)(
+          dx(vel1)*dx(u1) + dy(vel2)*dy(u2) 
+          - dx(u1)*p - dy(u2)*p
+          - p*q*0.000001
+          - dx(vel1)*q - dy(vel2)*q
+     ) 
+     // + on(1, vel1=0.42, vel2=0) + on(2, vel1=0, vel2=0.42) 
+     // + on(3, vel1=-0.42, vel2=0) + on(4, vel1=0, vel2=-0.42)
+
+     + on(1, 2, 3, 4, vel1 = 0, vel2 = 0.3)
+
+     + on(5, vel1=-2.4*N.x, vel2=-2.4*N.y) 
+     + on(6, vel1=1.2*N.x, vel2=1.2*N.y);
+
+for (int t = 0; t < 200; t++) {
+     cout << t * tau << endl;
+     psi = kk*phi;
+     solve Poisson1(phi, v) = int2d(Th)(phi*v) - int2d(Th)(phiPrev*v) 
+                         + int2d(Th)(tau*alpha*(dx(phi)*dx(v) + dy(phi)*dy(v))) 
+
+                         + int1d(Th, 1, 2, 3, 4)(tau*gamma*phi*v) 
+                         - int1d(Th, 1, 2, 3, 4)(tau*gamma*8.2*v)
+
+                         + int1d(Th, 5)(tau*gamma*phi*v) 
+                         - int1d(Th, 5)(tau*gamma*9.2*v)
+
+                         + int1d(Th, 6)(tau*gamma*phi*v) 
+                         - int1d(Th, 6)(tau*gamma*8.2*v)
+
+                         - int2d(Th)(tau*alpha*theta*v)
+                         + int2d(Th)(tau*alpha*psi*v)
+                         + int2d(Th)(tau*dx(phi)*v*vel1)
+                         + int2d(Th)(tau*dy(phi)*v*vel2);
+     // phi = 4*(phi < 4) + 9.2*(phi > 9.2) + phi*(4 <= phi)*(phi <= 9.2);
+     phiPrev = phi;
+
+     mu = mu0*thetaPrev/(thetaPrev + theta50);
+     psi = kk*phi;
+     solve Poisson2(theta, v) = int2d(Th)(theta*v) - int2d(Th)(thetaPrev*v)
+                              + int2d(Th)(tau*beta*dx(theta)*dx(v)) 
+                              + int2d(Th)(tau*beta*dy(theta)*dy(v))
+
+                              + int1d(Th, 1, 2, 3, 4)(tau*delta*theta*v)
+                              - int1d(Th, 1, 2, 3, 4)(tau*delta*kk*8.2*v)
+
+                              + int1d(Th, 5)(tau*delta*theta*v)
+                              - int1d(Th, 5)(tau*delta*kk*9.2*v)
+
+                              + int1d(Th, 6)(tau*delta*theta*v)
+                              - int1d(Th, 6)(tau*delta*kk*8.2*v)
+
+                              + int2d(Th)(tau*kappa*a*theta*v)
+                              + int2d(Th)(tau*mu*v)
+                              - int2d(Th)(tau*kappa*a*psi*v);
+     // theta = 0.01*(theta < 0.01) + 0.16*(theta > 0.16) + theta*(0.01 <= theta)*(theta <= 0.16);
+     thetaPrev = theta;
+     plot(theta, wait=0, value=true, fill=true);
+     // plot(theta, wait=0, value=true, fill=true);
+     // plot([vel1, vel2], wait=0, value=true, fill=true);
+}

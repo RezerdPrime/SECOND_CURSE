@@ -1,0 +1,1203 @@
+-- FreeFem++ v4.14 (Mon Mar 18 14:46:45 CET 2024 - git v4.14-47-gf36d6d9d)
+   file : C:\Users\Lenovo\Desktop\CodeShit\FreeFEM\test\lineartest.edp
+ Load: lg_fem lg_mesh lg_mesh3 eigenvalue
+    1 : load "medit"(load: loadLibary C:\Program Files (x86)\FreeFem++\\.\medit = 0)
+    2 :
+    3 : // border S1(t=-0.5, 0.5) {x=0.5; y=t; label=1;}
+    4 : // border S2(t=-0.5, 0.5) {x=-t; y=0.5; label=1;}
+    5 : // border S3(t=-0.5, 0.5) {x=-0.5; y=-t; label=1;}
+    6 : // border S4(t=-0.5, 0.5) {x=t; y=-0.5; label=1;}
+    7 :
+    8 : real rr = 0.05;
+    9 :
+   10 : real[int] A = [1.3, 0.5];
+   11 : real[int] B = [1.0, 0.8];
+   12 : real[int] C = [0.7, 0.7];
+   13 : real[int] D = [0.35, 1.0];
+   14 :
+   15 : real[int] E = [0.3, 0.3];
+   16 : real[int] F = [0.6, 1.2];
+   17 : real[int] G = [0.8, 0.4];
+   18 : real[int] H = [1.2, 1.25];
+   19 :
+   20 :
+   21 : border C1(t = 0,1.5)    {x=t;     y=0;     label = 1;}
+   22 : border C2(t = 0,1.5)    {x=1.5;   y=t;     label = 2;}
+   23 : border C3(t = 0,1.5)    {x=1.5-t; y=1.5;   label = 3;}
+   24 : border C4(t = 0,1.5)    {x=0;     y=1.5-t; label = 4;}
+   25 :
+   26 : border In1(t=0, 2*pi) {x=-rr*cos(t) + A[0];
+   27 :                        y=rr*sin(t) + A[1]; label=5;}
+   28 : border In2(t=0, 2*pi) {x=-rr*cos(t) + B[0];
+   29 :                        y=rr*sin(t) + B[1]; label=5;}
+   30 : border In3(t=0, 2*pi) {x=rr*cos(t) + C[0];
+   31 :                        y=-rr*sin(t) + C[1]; label=5;}
+   32 : border In4(t=0, 2*pi) {x=-rr*cos(t) + D[0];
+   33 :                        y=rr*sin(t) + D[1]; label=5;}
+   34 : border Out1(t=0, 2*pi) {x=-rr*cos(t) + E[0];
+   35 :                         y=rr*sin(t) + E[1]; label=6;}
+   36 : border Out2(t=0, 2*pi) {x=-rr*cos(t) + F[0];
+   37 :                         y=rr*sin(t) + F[1]; label=6;}
+   38 : border Out3(t=0, 2*pi) {x=-rr*cos(t) + G[0];
+   39 :                         y=rr*sin(t) + G[1]; label=6;}
+   40 : border Out4(t=0, 2*pi) {x=-rr*cos(t) + H[0];
+   41 :                         y=rr*sin(t) + H[1]; label=6;}
+   42 :
+   43 : int CIRCLES = 8, LINES = 60;
+   44 :
+   45 : mesh Th = buildmesh(C1(LINES) + C2(LINES) + C3(LINES) + C4(LINES)
+   46 :                     + In1(CIRCLES) + In2(CIRCLES) + In3(CIRCLES) + In4(CIRCLES)
+   47 :                     + Out1(CIRCLES) + Out2(CIRCLES) + Out3(CIRCLES) + Out4(CIRCLES));
+   48 : medit("domain", Th);
+   49 :
+   50 :
+   51 : real sigma = 0.03, alpha = 2.2e-3, beta = 2.4e-3, a=39, b=9.2,
+   52 :      psiH = 3.6e-2, mu0 = 0.08, r=2.73;
+   53 : real gamma = 1000*alpha, delta = 1000*beta,
+   54 :      phi0 = 4, theta0 = 0.01, kappa = sigma / (1 - sigma);
+   55 : real kk, tau = 0.05; // шаг по времени
+   56 :
+   57 : fespace Vh(Th, P1);
+   58 : Vh vel1, vel2, p, u1, u2, q, phi, theta, v, mu, psi, phiPrev, thetaPrev, theta50, phiB, thetaB;//, thetalinear;
+   59 : phiPrev = phi0;
+   60 : thetaPrev = theta0;
+   61 : theta = theta0;
+   62 :
+   63 : Vh thetaD;
+   64 : //thetalinear = theta0;
+   65 : kk = 2./115; //theta0 / phi0;
+   66 : vel2 = 0.2;
+   67 : theta50 = 5e-5;
+   68 :
+   69 : //phiB = 9.2*((x+A[0])^2 + (y+A[1])^2 < rr) + 9.2*((x+B[0])^2 + (y+B[1])^2 < rr) + 8.2*((x+C[0])^2 + (y+C[1])^2
+< rr) + 8.2*((x+D[0])^2 + (y+D[1])^2 < rr);
+   70 : //thetaB = 0.16*((x+A[0])^2 + (y+A[1])^2 < rr) + 0.16*((x+B[0])^2 + (y+B[1])^2 < rr) + 0.076*((x+C[0])^2 + (y+C[1])^2 < rr) + 0.076*((x+D[0])^2 + (y+D[1])^2 < rr);
+   71 :
+   72 : phiB = 0.2;
+   73 : thetaB = 0.9;
+   74 :
+   75 : //-rr*cos(t) + 0.8;
+   76 : //                        y=rr*sin(t) + 0.3; label=2;}
+   77 : // border In2(t=0, 2*pi) {x=-rr*cos(t) + 0.37;
+   78 : //                        y=rr*sin(t) + 0.58;
+   79 : // func real g(real phi, real phiB, real thetaB) {
+   80 : //     return phi * k;
+   81 : // }
+   82 :
+   83 : // func real mu(real theta) {
+   84 : //     return ;
+   85 : // }
+   86 :
+   87 : // func f(real psi) {
+   88 : //     return psi + b * psi^r / (psi^r + c);
+   89 : // }
+   90 :
+   91 : // real phi_target = 5.0; // Значение для phi, которое необходимо найти
+   92 : // real psi_guess = ; // Начальное предположение для psi
+   93 : // real tolerance = 1e-6; // Допустимое отклонение
+   94 :
+   95 : // real psi = psi_guess;
+   96 : // real psi_prev;
+   97 :
+   98 : // do {
+   99 : //     psi_prev = psi;
+  100 : //     real f_val = f(psi) - phi_target;
+  101 : //     real f_prime = (f(psi + 1e-6) - f(psi)) / 1e-6;
+  102 : //     psi = psi - f_val / f_prime;
+  103 : // } while (abs(psi - psi_prev) > tolerance);
+  104 :
+  105 :
+  106 : solve Stokes(vel1, vel2, p, u1, u2, q) = int2d(Th)(
+  107 :           dx(vel1)*dx(u1) + dy(vel2)*dy(u2)
+  108 :           - dx(u1)*p - dy(u2)*p
+  109 :           - p*q*0.000001
+  110 :           - dx(vel1)*q - dy(vel2)*q
+  111 :      )
+  112 :      // + on(1, vel1=0.42, vel2=0) + on(2, vel1=0, vel2=0.42)
+  113 :      // + on(3, vel1=-0.42, vel2=0) + on(4, vel1=0, vel2=-0.42)
+  114 :
+  115 :      + on(1, 2, 3, 4, vel1 = 0, vel2 = 0.3)
+  116 :
+  117 :      + on(5, vel1=-2.4*N.x, vel2=-2.4*N.y)
+  118 :      + on(6, vel1=1.2*N.x, vel2=1.2*N.y);
+  119 :
+  120 : for (int t = 0; t < 200; t++) {
+  121 :      cout << t * tau << endl;
+  122 :      psi = kk*phi;
+  123 :      solve Poisson1(phi, v) = int2d(Th)(phi*v) - int2d(Th)(phiPrev*v)
+  124 :                          + int2d(Th)(tau*alpha*(dx(phi)*dx(v) + dy(phi)*dy(v)))
+  125 :
+  126 :                          + int1d(Th, 1, 2, 3, 4)(tau*gamma*phi*v)
+  127 :                          - int1d(Th, 1, 2, 3, 4)(tau*gamma*8.2*v)
+  128 :
+  129 :                          + int1d(Th, 5)(tau*gamma*phi*v)
+  130 :                          - int1d(Th, 5)(tau*gamma*9.2*v)
+  131 :
+  132 :                          + int1d(Th, 6)(tau*gamma*phi*v)
+  133 :                          - int1d(Th, 6)(tau*gamma*8.2*v)
+  134 :
+  135 :                          - int2d(Th)(tau*alpha*theta*v)
+  136 :                          + int2d(Th)(tau*alpha*psi*v)
+  137 :                          + int2d(Th)(tau*dx(phi)*v*vel1)
+  138 :                          + int2d(Th)(tau*dy(phi)*v*vel2);
+  139 :      // phi = 4*(phi < 4) + 9.2*(phi > 9.2) + phi*(4 <= phi)*(phi <= 9.2);
+  140 :      phiPrev = phi;
+  141 :
+  142 :      mu = mu0*thetaPrev/(thetaPrev + theta50);
+  143 :      psi = kk*phi;
+  144 :      solve Poisson2(theta, v) = int2d(Th)(theta*v) - int2d(Th)(thetaPrev*v)
+  145 :                               + int2d(Th)(tau*beta*dx(theta)*dx(v))
+  146 :                               + int2d(Th)(tau*beta*dy(theta)*dy(v))
+  147 :
+  148 :                               + int1d(Th, 1, 2, 3, 4)(tau*delta*theta*v)
+  149 :                               - int1d(Th, 1, 2, 3, 4)(tau*delta*kk*8.2*v)
+  150 :
+  151 :                               + int1d(Th, 5)(tau*delta*theta*v)
+  152 :                               - int1d(Th, 5)(tau*delta*kk*9.2*v)
+  153 :
+  154 :                               + int1d(Th, 6)(tau*delta*theta*v)
+  155 :                               - int1d(Th, 6)(tau*delta*kk*8.2*v)
+  156 :
+  157 :                               + int2d(Th)(tau*kappa*a*theta*v)
+  158 :                               + int2d(Th)(tau*mu*v)
+  159 :                               - int2d(Th)(tau*kappa*a*psi*v);
+  160 :      // theta = 0.01*(theta < 0.01) + 0.16*(theta > 0.16) + theta*(0.01 <= theta)*(theta <= 0.16);
+  161 :      thetaPrev = theta;
+  162 :      plot(theta, wait=0, value=true, fill=true);
+  163 :      // plot(theta, wait=0, value=true, fill=true);
+  164 :      // plot([vel1, vel2], wait=0, value=true, fill=true);
+  165 : }
+  166 :  sizestack + 1024 =13864  ( 12840 )
+ 
+  --  mesh:  Nb of Triangles =   4778, Nb of Vertices 2534
+version de medit ffmedit.exe -popen -filebin 1  domain
+  -- Medit,  Release 3.0a (Nov. 30, 2007)
+     Copyright (c) LJLL, 1999-2007.
+     compiled:  Mon Mar 4 11:44:04 CET 2024 (with ff++ 4.14).
+ 
+medit with binary version of popen : mesh(es)
+mesh_name= domain
+ Loading data file(s)
+End of mesh
+  Input seconds:     0.00
+ 
+ medit1()
+ 
+ Building scene(s)
+  Creating scene 1
+   Loading default options
+  Scene seconds:     0.23
+ 
+ Rendering scene(s)
+ 
+ Total running seconds:  1.28
+ Thank you for using Medit.
+ kk 3 3 :   -- Solve :
+          min -2.21731  max 2.21731
+          min -2.21731  max 2.21731
+          min -572064  max 572211
+0
+  -- Solve :
+          min 1.73179  max 9.93764
+  -- Solve :
+          min -0.00697611  max 0.144753
+0.05
+  -- Solve :
+          min 1.0788  max 10.5065
+  -- Solve :
+          min 2.78019e-05  max 0.153499
+0.1
+  -- Solve :
+          min 0.753178  max 10.4659
+  -- Solve :
+          min 0.00586935  max 0.15473
+0.15
+  -- Solve :
+          min 0.524971  max 10.3992
+  -- Solve :
+          min 0.00659206  max 0.15522
+0.2
+  -- Solve :
+          min 0.428336  max 10.3418
+  -- Solve :
+          min 0.0074491  max 0.155571
+0.25
+  -- Solve :
+          min 0.424105  max 10.2762
+  -- Solve :
+          min 0.00735344  max 0.155848
+0.3
+  -- Solve :
+          min 0.504225  max 10.1976
+  -- Solve :
+          min 0.0070719  max 0.156075
+0.35
+  -- Solve :
+          min 0.679754  max 10.1104
+  -- Solve :
+          min 0.00690602  max 0.156265
+0.4
+  -- Solve :
+          min 0.818401  max 10.0209
+  -- Solve :
+          min 0.00686159  max 0.156427
+0.45
+  -- Solve :
+          min 0.923163  max 9.93384
+  -- Solve :
+          min 0.00695383  max 0.156566
+0.5
+  -- Solve :
+          min 1.07559  max 9.85248
+  -- Solve :
+          min 0.0069055  max 0.156688
+0.55
+  -- Solve :
+          min 1.27967  max 9.80386
+  -- Solve :
+          min 0.00675419  max 0.156802
+0.6
+  -- Solve :
+          min 1.5374  max 9.82638
+  -- Solve :
+          min 0.00664318  max 0.15692
+0.65
+  -- Solve :
+          min 1.76938  max 9.83355
+  -- Solve :
+          min 0.00657992  max 0.157026
+0.7
+  -- Solve :
+          min 1.96478  max 9.83484
+  -- Solve :
+          min 0.00657247  max 0.157122
+0.75
+  -- Solve :
+          min 2.19325  max 9.83461
+  -- Solve :
+          min 0.00662928  max 0.15721
+0.8
+  -- Solve :
+          min 2.4511  max 9.83462
+  -- Solve :
+          min 0.0067589  max 0.157289
+0.85
+  -- Solve :
+          min 2.73284  max 9.83541
+  -- Solve :
+          min 0.0069696  max 0.157362
+0.9
+  -- Solve :
+          min 3.03175  max 9.83701
+  -- Solve :
+          min 0.00726888  max 0.157427
+0.95
+  -- Solve :
+          min 3.34066  max 9.83927
+  -- Solve :
+          min 0.007663  max 0.157488
+1
+  -- Solve :
+          min 3.65258  max 9.84197
+  -- Solve :
+          min 0.00815662  max 0.157542
+1.05
+  -- Solve :
+          min 3.91336  max 9.88219
+  -- Solve :
+          min 0.00875126  max 0.157592
+1.1
+  -- Solve :
+          min 4.13471  max 9.94932
+  -- Solve :
+          min 0.00937175  max 0.157637
+1.15
+  -- Solve :
+          min 4.30542  max 9.99488
+  -- Solve :
+          min 0.0100833  max 0.157679
+1.2
+  -- Solve :
+          min 4.39286  max 10.0252
+  -- Solve :
+          min 0.010886  max 0.157717
+1.25
+  -- Solve :
+          min 4.48755  max 10.045
+  -- Solve :
+          min 0.0117786  max 0.157751
+1.3
+  -- Solve :
+          min 4.56752  max 10.0577
+  -- Solve :
+          min 0.0127586  max 0.157782
+1.35
+  -- Solve :
+          min 4.64865  max 10.0658
+  -- Solve :
+          min 0.0138225  max 0.157811
+1.4
+  -- Solve :
+          min 4.73508  max 10.0709
+  -- Solve :
+          min 0.0149659  max 0.157837
+1.45
+  -- Solve :
+          min 4.82643  max 10.0741
+  -- Solve :
+          min 0.016184  max 0.157861
+1.5
+  -- Solve :
+          min 4.92224  max 10.0761
+  -- Solve :
+          min 0.0174714  max 0.157882
+1.55
+  -- Solve :
+          min 5.02203  max 10.0774
+  -- Solve :
+          min 0.0188224  max 0.157902
+1.6
+  -- Solve :
+          min 5.1253  max 10.0782
+  -- Solve :
+          min 0.0202313  max 0.15792
+1.65
+  -- Solve :
+          min 5.23151  max 10.0787
+  -- Solve :
+          min 0.021692  max 0.157937
+1.7
+  -- Solve :
+          min 5.34016  max 10.0791
+  -- Solve :
+          min 0.0231939  max 0.157952
+1.75
+  -- Solve :
+          min 5.45071  max 10.0793
+  -- Solve :
+          min 0.0246788  max 0.157966
+1.8
+  -- Solve :
+          min 5.56267  max 10.0795
+  -- Solve :
+          min 0.0261989  max 0.157979
+1.85
+  -- Solve :
+          min 5.67553  max 10.0796
+  -- Solve :
+          min 0.0277496  max 0.15799
+1.9
+  -- Solve :
+          min 5.78881  max 10.0796
+  -- Solve :
+          min 0.0293259  max 0.158001
+1.95
+  -- Solve :
+          min 5.90204  max 10.0796
+  -- Solve :
+          min 0.0309231  max 0.158011
+2
+  -- Solve :
+          min 6.01475  max 10.0797
+  -- Solve :
+          min 0.0325364  max 0.15802
+2.05
+  -- Solve :
+          min 6.12653  max 10.0797
+  -- Solve :
+          min 0.034161  max 0.158028
+2.1
+  -- Solve :
+          min 6.23696  max 10.0797
+  -- Solve :
+          min 0.0357921  max 0.158035
+2.15
+  -- Solve :
+          min 6.34567  max 10.0797
+  -- Solve :
+          min 0.037425  max 0.158042
+2.2
+  -- Solve :
+          min 6.45232  max 10.0796
+  -- Solve :
+          min 0.0390554  max 0.158049
+2.25
+  -- Solve :
+          min 6.55658  max 10.0796
+  -- Solve :
+          min 0.0406788  max 0.158055
+2.3
+  -- Solve :
+          min 6.65821  max 10.0796
+  -- Solve :
+          min 0.042291  max 0.15806
+2.35
+  -- Solve :
+          min 6.75696  max 10.0796
+  -- Solve :
+          min 0.0438882  max 0.158065
+2.4
+  -- Solve :
+          min 6.85266  max 10.0795
+  -- Solve :
+          min 0.0454665  max 0.15807
+2.45
+  -- Solve :
+          min 6.94516  max 10.0795
+  -- Solve :
+          min 0.0470228  max 0.158074
+2.5
+  -- Solve :
+          min 7.03435  max 10.0795
+  -- Solve :
+          min 0.0485537  max 0.158078
+2.55
+  -- Solve :
+          min 7.12016  max 10.0795
+  -- Solve :
+          min 0.0500567  max 0.158082
+2.6
+  -- Solve :
+          min 7.20257  max 10.0794
+  -- Solve :
+          min 0.051529  max 0.158085
+2.65
+  -- Solve :
+          min 7.28155  max 10.0794
+  -- Solve :
+          min 0.0529687  max 0.158088
+2.7
+  -- Solve :
+          min 7.35714  max 10.0794
+  -- Solve :
+          min 0.0543738  max 0.158091
+2.75
+  -- Solve :
+          min 7.42937  max 10.0794
+  -- Solve :
+          min 0.0557428  max 0.158094
+2.8
+  -- Solve :
+          min 7.49831  max 10.0794
+  -- Solve :
+          min 0.0570744  max 0.158096
+2.85
+  -- Solve :
+          min 7.56401  max 10.0793
+  -- Solve :
+          min 0.0583676  max 0.158098
+2.9
+  -- Solve :
+          min 7.62658  max 10.0793
+  -- Solve :
+          min 0.0596217  max 0.158101
+2.95
+  -- Solve :
+          min 7.6861  max 10.0793
+  -- Solve :
+          min 0.0608361  max 0.158103
+3
+  -- Solve :
+          min 7.74267  max 10.0793
+  -- Solve :
+          min 0.0620105  max 0.158104
+3.05
+  -- Solve :
+          min 7.79639  max 10.0794
+  -- Solve :
+          min 0.063145  max 0.158106
+3.1
+  -- Solve :
+          min 7.84738  max 10.0797
+  -- Solve :
+          min 0.0642394  max 0.158108
+3.15
+  -- Solve :
+          min 7.89573  max 10.0799
+  -- Solve :
+          min 0.0652941  max 0.158109
+3.2
+  -- Solve :
+          min 7.94155  max 10.0802
+  -- Solve :
+          min 0.0662948  max 0.158111
+3.25
+  -- Solve :
+          min 7.98495  max 10.0804
+  -- Solve :
+          min 0.0672381  max 0.158112
+3.3
+  -- Solve :
+          min 8.02603  max 10.0805
+  -- Solve :
+          min 0.068144  max 0.158113
+3.35
+  -- Solve :
+          min 8.0649  max 10.0807
+  -- Solve :
+          min 0.0690133  max 0.158114
+3.4
+  -- Solve :
+          min 8.10164  max 10.0808
+  -- Solve :
+          min 0.0698469  max 0.158115
+3.45
+  -- Solve :
+          min 8.13143  max 10.0809
+  -- Solve :
+          min 0.0706455  max 0.158116
+3.5
+  -- Solve :
+          min 8.13136  max 10.081
+  -- Solve :
+          min 0.0714101  max 0.158117
+3.55
+  -- Solve :
+          min 8.13129  max 10.0811
+  -- Solve :
+          min 0.0721389  max 0.158118
+3.6
+  -- Solve :
+          min 8.13122  max 10.0811
+  -- Solve :
+          min 0.0728172  max 0.158119
+3.65
+  -- Solve :
+          min 8.13116  max 10.0812
+  -- Solve :
+          min 0.0734654  max 0.158119
+3.7
+  -- Solve :
+          min 8.1311  max 10.0812
+  -- Solve :
+          min 0.0740844  max 0.15812
+3.75
+  -- Solve :
+          min 8.13104  max 10.0813
+  -- Solve :
+          min 0.0746753  max 0.158121
+3.8
+  -- Solve :
+          min 8.13098  max 10.0813
+  -- Solve :
+          min 0.0752389  max 0.158121
+3.85
+  -- Solve :
+          min 8.13093  max 10.0814
+  -- Solve :
+          min 0.0757591  max 0.158122
+3.9
+  -- Solve :
+          min 8.13088  max 10.0814
+  -- Solve :
+          min 0.0762493  max 0.158122
+3.95
+  -- Solve :
+          min 8.13083  max 10.0814
+  -- Solve :
+          min 0.0765349  max 0.158123
+4
+  -- Solve :
+          min 8.13079  max 10.0814
+  -- Solve :
+          min 0.0766664  max 0.158123
+4.05
+  -- Solve :
+          min 8.13075  max 10.0814
+  -- Solve :
+          min 0.0767909  max 0.158124
+4.1
+  -- Solve :
+          min 8.13071  max 10.0815
+  -- Solve :
+          min 0.0769089  max 0.158124
+4.15
+  -- Solve :
+          min 8.13067  max 10.0815
+  -- Solve :
+          min 0.077018  max 0.158124
+4.2
+  -- Solve :
+          min 8.13064  max 10.0815
+  -- Solve :
+          min 0.0771145  max 0.158125
+4.25
+  -- Solve :
+          min 8.13061  max 10.0815
+  -- Solve :
+          min 0.0772058  max 0.158125
+4.3
+  -- Solve :
+          min 8.13058  max 10.0815
+  -- Solve :
+          min 0.0772922  max 0.158125
+4.35
+  -- Solve :
+          min 8.13055  max 10.0815
+  -- Solve :
+          min 0.077372  max 0.158126
+4.4
+  -- Solve :
+          min 8.13052  max 10.0815
+  -- Solve :
+          min 0.0774392  max 0.158126
+4.45
+  -- Solve :
+          min 8.1305  max 10.0815
+  -- Solve :
+          min 0.0775028  max 0.158126
+4.5
+  -- Solve :
+          min 8.13048  max 10.0815
+  -- Solve :
+          min 0.0775629  max 0.158126
+4.55
+  -- Solve :
+          min 8.13045  max 10.0815
+  -- Solve :
+          min 0.0776199  max 0.158127
+4.6
+  -- Solve :
+          min 8.13043  max 10.0815
+  -- Solve :
+          min 0.0776737  max 0.158127
+4.65
+  -- Solve :
+          min 8.13042  max 10.0815
+  -- Solve :
+          min 0.0777246  max 0.158127
+4.7
+  -- Solve :
+          min 8.1304  max 10.0815
+  -- Solve :
+          min 0.0777728  max 0.158127
+4.75
+  -- Solve :
+          min 8.13038  max 10.0815
+  -- Solve :
+          min 0.0778184  max 0.158127
+4.8
+  -- Solve :
+          min 8.13037  max 10.0815
+  -- Solve :
+          min 0.0778616  max 0.158127
+4.85
+  -- Solve :
+          min 8.13036  max 10.0815
+  -- Solve :
+          min 0.0779024  max 0.158128
+4.9
+  -- Solve :
+          min 8.13034  max 10.0815
+  -- Solve :
+          min 0.077941  max 0.158128
+4.95
+  -- Solve :
+          min 8.13033  max 10.0816
+  -- Solve :
+          min 0.0779775  max 0.158128
+5
+  -- Solve :
+          min 8.13032  max 10.0816
+  -- Solve :
+          min 0.078012  max 0.158128
+5.05
+  -- Solve :
+          min 8.13031  max 10.0816
+  -- Solve :
+          min 0.0780447  max 0.158128
+5.1
+  -- Solve :
+          min 8.1303  max 10.0816
+  -- Solve :
+          min 0.0780756  max 0.158128
+5.15
+  -- Solve :
+          min 8.13029  max 10.0816
+  -- Solve :
+          min 0.0781048  max 0.158128
+5.2
+  -- Solve :
+          min 8.13028  max 10.0816
+  -- Solve :
+          min 0.0781325  max 0.158128
+5.25
+  -- Solve :
+          min 8.13028  max 10.0816
+  -- Solve :
+          min 0.0781586  max 0.158128
+5.3
+  -- Solve :
+          min 8.13027  max 10.0816
+  -- Solve :
+          min 0.0781834  max 0.158129
+5.35
+  -- Solve :
+          min 8.13026  max 10.0816
+  -- Solve :
+          min 0.0782068  max 0.158129
+5.4
+  -- Solve :
+          min 8.13026  max 10.0816
+  -- Solve :
+          min 0.0782289  max 0.158129
+5.45
+  -- Solve :
+          min 8.13025  max 10.0816
+  -- Solve :
+          min 0.0782498  max 0.158129
+5.5
+  -- Solve :
+          min 8.13025  max 10.0816
+  -- Solve :
+          min 0.0782696  max 0.158129
+5.55
+  -- Solve :
+          min 8.13024  max 10.0816
+  -- Solve :
+          min 0.0782883  max 0.158129
+5.6
+  -- Solve :
+          min 8.13024  max 10.0816
+  -- Solve :
+          min 0.078306  max 0.158129
+5.65
+  -- Solve :
+          min 8.13023  max 10.0816
+  -- Solve :
+          min 0.0783228  max 0.158129
+5.7
+  -- Solve :
+          min 8.13023  max 10.0816
+  -- Solve :
+          min 0.0783386  max 0.158129
+5.75
+  -- Solve :
+          min 8.13022  max 10.0816
+  -- Solve :
+          min 0.0783536  max 0.158129
+5.8
+  -- Solve :
+          min 8.13022  max 10.0816
+  -- Solve :
+          min 0.0783677  max 0.158129
+5.85
+  -- Solve :
+          min 8.13022  max 10.0816
+  -- Solve :
+          min 0.0783811  max 0.158129
+5.9
+  -- Solve :
+          min 8.13022  max 10.0816
+  -- Solve :
+          min 0.0783938  max 0.158129
+5.95
+  -- Solve :
+          min 8.13021  max 10.0816
+  -- Solve :
+          min 0.0784057  max 0.158129
+6
+  -- Solve :
+          min 8.13021  max 10.0816
+  -- Solve :
+          min 0.078417  max 0.158129
+6.05
+  -- Solve :
+          min 8.13021  max 10.0816
+  -- Solve :
+          min 0.0784277  max 0.158129
+6.1
+  -- Solve :
+          min 8.13021  max 10.0816
+  -- Solve :
+          min 0.0784378  max 0.158129
+6.15
+  -- Solve :
+          min 8.1302  max 10.0816
+  -- Solve :
+          min 0.0784474  max 0.158129
+6.2
+  -- Solve :
+          min 8.1302  max 10.0816
+  -- Solve :
+          min 0.0784564  max 0.158129
+6.25
+  -- Solve :
+          min 8.1302  max 10.0816
+  -- Solve :
+          min 0.0784649  max 0.158129
+6.3
+  -- Solve :
+          min 8.1302  max 10.0816
+  -- Solve :
+          min 0.078473  max 0.158129
+6.35
+  -- Solve :
+          min 8.1302  max 10.0816
+  -- Solve :
+          min 0.0784806  max 0.158129
+6.4
+  -- Solve :
+          min 8.1302  max 10.0816
+  -- Solve :
+          min 0.0784878  max 0.158129
+6.45
+  -- Solve :
+          min 8.1302  max 10.0816
+  -- Solve :
+          min 0.0784946  max 0.158129
+6.5
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785011  max 0.158129
+6.55
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785072  max 0.158129
+6.6
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785129  max 0.158129
+6.65
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785184  max 0.158129
+6.7
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785235  max 0.158129
+6.75
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785283  max 0.158129
+6.8
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785329  max 0.158129
+6.85
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785372  max 0.158129
+6.9
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785413  max 0.158129
+6.95
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785452  max 0.158129
+7
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785489  max 0.158129
+7.05
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785523  max 0.158129
+7.1
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785556  max 0.158129
+7.15
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785586  max 0.158129
+7.2
+  -- Solve :
+          min 8.13019  max 10.0816
+  -- Solve :
+          min 0.0785616  max 0.158129
+7.25
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785643  max 0.158129
+7.3
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785669  max 0.158129
+7.35
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785693  max 0.15813
+7.4
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785717  max 0.15813
+7.45
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785738  max 0.15813
+7.5
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785759  max 0.15813
+7.55
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785779  max 0.15813
+7.6
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785797  max 0.15813
+7.65
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785814  max 0.15813
+7.7
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785831  max 0.15813
+7.75
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785846  max 0.15813
+7.8
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785861  max 0.15813
+7.85
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785875  max 0.15813
+7.9
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785888  max 0.15813
+7.95
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.07859  max 0.15813
+8
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785912  max 0.15813
+8.05
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785923  max 0.15813
+8.1
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785933  max 0.15813
+8.15
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785943  max 0.15813
+8.2
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785952  max 0.15813
+8.25
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785961  max 0.15813
+8.3
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785969  max 0.15813
+8.35
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785977  max 0.15813
+8.4
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785984  max 0.15813
+8.45
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785991  max 0.15813
+8.5
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0785997  max 0.15813
+8.55
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786004  max 0.15813
+8.6
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786009  max 0.15813
+8.65
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786015  max 0.15813
+8.7
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.078602  max 0.15813
+8.75
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786025  max 0.15813
+8.8
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.078603  max 0.15813
+8.85
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786034  max 0.15813
+8.9
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786038  max 0.15813
+8.95
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786042  max 0.15813
+9
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786046  max 0.15813
+9.05
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786049  max 0.15813
+9.1
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786052  max 0.15813
+9.15
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786055  max 0.15813
+9.2
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786058  max 0.15813
+9.25
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786061  max 0.15813
+9.3
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786063  max 0.15813
+9.35
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786066  max 0.15813
+9.4
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786068  max 0.15813
+9.45
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.078607  max 0.15813
+9.5
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786072  max 0.15813
+9.55
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786074  max 0.15813
+9.6
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786076  max 0.15813
+9.65
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786078  max 0.15813
+9.7
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786079  max 0.15813
+9.75
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786081  max 0.15813
+9.8
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786082  max 0.15813
+9.85
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786084  max 0.15813
+9.9
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786085  max 0.15813
+9.95
+  -- Solve :
+          min 8.13018  max 10.0816
+  -- Solve :
+          min 0.0786086  max 0.15813
+times: compile 0.214s, execution 16.17s,  mpirank:0
+ ######## We forget of deleting   36405 Nb pointer,   0Bytes  ,  mpirank 0, memory leak =0
+ CodeAlloc : nb ptr  5138,  size :589688 mpirank: 0
+Ok: Normal End
+ try getConsole C:\Users\Lenovo\Desktop\CodeShit\FreeFEM\test\lineartest.edp

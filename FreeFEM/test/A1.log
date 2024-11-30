@@ -1,0 +1,119 @@
+-- FreeFem++ v4.14 (Mon Mar 18 14:46:45 CET 2024 - git v4.14-47-gf36d6d9d)
+   file : C:\Users\Lenovo\Desktop\CodeShit\FreeFEM\test\A1.edp
+ Load: lg_fem lg_mesh lg_mesh3 eigenvalue
+    1 : load "medit"(load: loadLibary C:\Program Files (x86)\FreeFem++\\.\medit = 0)
+    2 :
+    3 : border C1 (t = 0,        2.*pi/3.) {x=cos(t); y=sin(t); label = 1;}
+    4 : border C2 (t = 2.*pi/3., 4.*pi/3.) {x=cos(t); y=sin(t); label = 2;}
+    5 : border C3 (t = 4.*pi/3., 2*pi    ) {x=cos(t); y=sin(t); label = 3;}
+    6 :
+    7 : mesh Th0 = buildmesh (C1(15) + C2(15) + C3(15) );
+    8 :
+    9 : medit("mesh", Th0, wait = 1);
+   10 :
+   11 :
+   12 :
+   13 :
+   14 :
+   15 :
+   16 :
+   17 :
+   18 :
+   19 : border C01(t = 0,       2*pi    ) {x= 0.5+0.1*cos(t); y=0.1*sin(t); label = 4;}
+   20 : border C02(t = 0,       2*pi    ) {x=-0.5+0.1*cos(t); y=0.1*sin(t); label = 4;}
+   21 : border C03(t = 0,       2*pi    ) {x= 0.1*cos(t); y=0.5+0.1*sin(t); label = 4;}
+   22 :
+   23 : mesh Th  = buildmesh (C1(15) + C2(15) + C3(15) + C01(24) + C02(24) + C03(24));
+   24 :
+   25 : medit("mesh", Th,  wait = 1);
+   26 :
+   27 :
+   28 : real ppp = 0.1;
+   29 :
+   30 : real a = 1, b = 1000, ub = 0.;
+   31 :
+   32 : func real f1(real x, real y)
+ *** Warning  The identifier x hide a Global identifier
+ 
+ *** Warning  The identifier y hide a Global identifier
+{
+   33 :
+   34 :     if(((x-0.5)^2 + y^2) < 0.01) return ppp;
+   35 :     return 0.;
+   36 : }
+   37 :
+   38 :
+   39 :
+   40 :
+   41 : fespace Vh(Th,P1);
+   42 : Vh u,v;
+   43 :
+   44 : fespace Ph(Th,P0);
+   45 : Ph f2;
+   46 :
+   47 : f2 = ppp*((x+0.5)^2 + y^2 < 0.01) + ppp*(x^2 + (y-0.5)^2 < 0.01);
+   48 :
+   49 : //plot(f2, wait=true, value=true, fill=true);
+   50 :
+   51 :
+   52 :
+   53 : solve Poisson(u,v) = int2d(Th)(a*dx(u)*dx(v) + a*dy(u)*dy(v)) - int2d(Th)(f1(x,y)*v) - int2d(Th)(f2*v)
+   54 :                    + int1d(Th,3)(b*u*v)  - int1d(Th,3)(b*ub*v)
+   55 :                    + on(1, u=0.1);
+   56 :
+   57 :
+   58 : plot(u, wait=true, value=true, fill=true); sizestack + 1024 =3416  ( 2392 )
+ 
+  --  mesh:  Nb of Triangles =    359, Nb of Vertices 203
+version de medit ffmedit.exe -popen -filebin 1  mesh
+  -- Medit,  Release 3.0a (Nov. 30, 2007)
+     Copyright (c) LJLL, 1999-2007.
+     compiled:  Mon Mar 4 11:44:04 CET 2024 (with ff++ 4.14).
+ 
+medit with binary version of popen : mesh(es)
+mesh_name= mesh
+ Loading data file(s)
+End of mesh
+  Input seconds:     0.00
+ 
+ medit1()
+ 
+ Building scene(s)
+  Creating scene 1
+   Loading default options
+  Scene seconds:     0.21
+ 
+ Rendering scene(s)
+ 
+ Total running seconds:  1.16
+ Thank you for using Medit.
+  --  mesh:  Nb of Triangles =   2927, Nb of Vertices 1487
+version de medit ffmedit.exe -popen -filebin 1  mesh
+  -- Medit,  Release 3.0a (Nov. 30, 2007)
+     Copyright (c) LJLL, 1999-2007.
+     compiled:  Mon Mar 4 11:44:04 CET 2024 (with ff++ 4.14).
+ 
+medit with binary version of popen : mesh(es)
+mesh_name= mesh
+ Loading data file(s)
+End of mesh
+  Input seconds:     0.00
+ 
+ medit1()
+ 
+ Building scene(s)
+  Creating scene 1
+   Loading default options
+  Scene seconds:     0.21
+ 
+ Rendering scene(s)
+ 
+ Total running seconds:  1.01
+ Thank you for using Medit.
+  -- Solve :
+          min -0.025528  max 0.1
+times: compile 0.063s, execution 2.542s,  mpirank:0
+ ######## We forget of deleting   82107 Nb pointer,   0Bytes  ,  mpirank 0, memory leak =0
+ CodeAlloc : nb ptr  4216,  size :538736 mpirank: 0
+Ok: Normal End
+ try getConsole C:\Users\Lenovo\Desktop\CodeShit\FreeFEM\test\A1.edp

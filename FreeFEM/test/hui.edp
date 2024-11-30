@@ -1,0 +1,56 @@
+//oad "medit"
+
+// for (int i = 1; i < 100 ;i++) {
+
+//     border C1 (t = 0, 2.*pi) {x=cos(t); y=sin(t) * i / 100; label = 1;}
+//     mesh Th = buildmesh (C1(10));
+//     plot(Th);
+// }
+
+// border C1 (t = 0, 2.*pi) {x=(5^(sin(t)^15))*cos(t); y=(5^(sin(t)^15))*sin(t); label = 1;}
+// mesh Th = buildmesh (C1(150));
+// plot(Th);
+
+// for (int i = 0; i < 365 ; i+=5) {
+//     mesh TH = movemesh(Th, [x * cos(pi*i/180) - y * sin(pi*i/180), x * sin(pi*i/180) + y * cos(pi*i/180)]);
+//     plot(TH);
+// }
+
+
+// border C1 (t = -5/4. * pi, pi / 4.) { x=(5^(sin(t)^15))*cos(t); y=(5^(sin(t)^15))*sin(t); label = 1; }
+
+// border C2 (t = pi / 4, 3/4. * pi) { x=(5^(sin(t)^15))*cos(t); y=(5^(sin(t)^15))*sin(t); label = 2; }
+
+// mesh Th = buildmesh (C1(20) + C2(40));
+// plot(Th);
+
+
+// border C1 (t = 0, 2.*pi) {x = 5^(sin(t) ^ 15) * cos(t); y = 5^(sin(t) ^ 15) * sin(t); label = 1;}
+
+// mesh Th = buildmesh(C1(350));
+
+// fespace Vh(Th,P1);
+
+// Vh f;
+// f = sin(x^2 + y^2) < 0.1;
+// plot(f, fill=true);
+
+
+// mesh Th = square(1, 1); // Создание прямоугольной сетки
+// fespace Vh(Th, P1); // Определение конечно-элементного пространства
+
+// Vh u = x + y; // Определение функции u = x + y
+// plot(u, cmm="Initial u"); // Визуализация начальной функции u
+
+// // Задание граничного условия u = sin(pi * x * y) на левой границе (граница номер 1)
+// on(1, u = sin(pi * x)); 
+
+// plot(u, cmm="Modified u with 2-variable boundary condition"); // Визуализация функции u с граничным условием
+
+int n = 5;
+int[int] Ai(n);
+
+for (int i = 0; i < n; i++)
+    Ai[i] = i;
+
+cout << Ai << endl;
